@@ -36,12 +36,13 @@ def oneHotEnc(df, columns_to_encode):
     return df_enc
 
 
+# median and mode can also be used
 def impute(df, columns_to_impute):
     
     df_imp = df.copy()
 
     for column_name in columns_to_impute:
 
-        df_imp[column_name] = df_imp[column_name].fillna(df_imp[column_name].mean()) # can replace with median or mode as well
+        df_imp[column_name] = df_imp[column_name].fillna(df_imp[column_name].mean())
 
     return df_imp

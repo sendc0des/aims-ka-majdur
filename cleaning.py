@@ -17,7 +17,6 @@ def ordEnc(df, columns_to_encode):
 
     return df_enc, mappings
 
-
 def oneHotEnc(df, columns_to_encode):
     df_enc = df.copy()  
     for column_name in columns_to_encode:
@@ -34,6 +33,11 @@ def oneHotEnc(df, columns_to_encode):
 def impute(df, columns_to_impute):
     df_imp = df.copy()
     for column_name in columns_to_impute:
-        df_imp[column_name] = df_imp[column_name].fillna(df_imp[column_name].mean())
+        if df_imp[column_name].isna.sum() == len(df_imp[column_name]):
+            continue
+        if pd.api.types.is_numeric_dtype(df_imp[column_name]):
+            df_imp[column_name] = df_imp[column_name].fillna(df_imp[column_name].mean())
+        else:
+            df_imp[column_name] = df_imp[column_name].fillna(df_imp[column_name].mode()[0])
         
     return df_imp

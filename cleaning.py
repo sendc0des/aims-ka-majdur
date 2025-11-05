@@ -2,27 +2,28 @@ import numpy as np
 import pandas as pd
 
 def ordEnc(df, columns_to_encode):
+    # make a copy of the original df to avoid changing the original data and also avoid SettingWithCopyWarning
     df_enc = df.copy()
     mappings = {}
-    for column_name in columns_to_encode:
+    for col in columns_to_encode:
 
-        categories = df_enc[column_name].dropna().unique()
+        categories = df_enc[col].dropna().unique()
         sorted_cats = sorted(categories)
 
         mapping = {cat : i for i, cat in enumerate(sorted_cats)}
-        mappings[column_name] = mapping
+        mappings[col] = mapping
 
-        new_col_name = f"{column_name}_encoded"
-        df_enc[new_col_name] = df_enc[column_name].map(mapping)
+        new_col_name = f"{col}_encoded"
+        df_enc[new_col_name] = df_enc[col].map(mapping)
 
     return df_enc, mappings
 
 def oneHotEnc(df, columns_to_encode):
     df_enc = df.copy()  
-    for column_name in columns_to_encode:
-        categories = df[column_name].dropna().unique()
+    for col in columns_to_encode:
+        categories = df_enc[col].dropna().unique()
         for category in categories:
-            df_enc[f"{column_name}_{category}"] = (df_enc[column_name] == category).astype(int)
+            df_enc[f"{col}_{category}"] = (df_enc[col] == category).astype(int)
         
     df_enc = df_enc.drop(columns = columns_to_encode)
 
@@ -32,12 +33,15 @@ def oneHotEnc(df, columns_to_encode):
 # median and mode can also be used
 def impute(df, columns_to_impute):
     df_imp = df.copy()
-    for column_name in columns_to_impute:
-        if df_imp[column_name].isna.sum() == len(df_imp[column_name]):
+    for col in columns_to_impute:
+        # if all values in a column are NAN
+        if df_imp[col].isna.sum() == len(df_imp[col]):
             continue
-        if pd.api.types.is_numeric_dtype(df_imp[column_name]):
-            df_imp[column_name] = df_imp[column_name].fillna(df_imp[column_name].mean())
+        # to implement .mean() only on numerical columns
+        if pd.api.types.is_numeric_dtype(df_imp[col]):
+            df_imp[col] = df_imp[col].fillna(df_imp[col].mean())
+        # for categorical columns -> replace with most frequent value using .mode()
         else:
-            df_imp[column_name] = df_imp[column_name].fillna(df_imp[column_name].mode()[0])
+            df_imp[col] = df_imp[col].fillna(df_imp[col].mode()[0])
         
     return df_imp
